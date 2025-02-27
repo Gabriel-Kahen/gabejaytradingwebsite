@@ -93,7 +93,7 @@ function App() {
 
   useEffect(() => {
     fetchData();
-    const interval = setInterval(fetchData, 15000);
+    const interval = setInterval(fetchData, 1000);
     return () => clearInterval(interval);
   }, [fetchData]);
 
@@ -109,4 +109,4 @@ function App() {
   );
 }
 
-export default App;
+export default App;sh
