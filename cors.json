@@ -1,9 +1,12 @@
 [
   {
-    "origin": [
-      "http://localhost:3000",
-      "https://gabejaytrading.com"
-    ],
+    "origin": ["http://localhost:3000"],
+    "method": ["GET"],
+    "responseHeader": ["Content-Type"],
+    "maxAgeSeconds": 3600
+  },
+  {
+    "origin": ["https://gabejaytrading.com"],
     "method": ["GET"],
     "responseHeader": ["Content-Type"],
     "maxAgeSeconds": 3600
