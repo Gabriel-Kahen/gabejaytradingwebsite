@@ -73,9 +73,11 @@ function App() {
 
   const fetchData = useCallback(async () => {
     try {
-      const response = await fetch(CSV_URL);
+      // Append a timestamp to prevent caching.
+      const csvUrl = `${CSV_URL}?t=${Date.now()}`;
+      const response = await fetch(csvUrl);
       const csvData = await response.text();
-
+  
       Papa.parse(csvData, {
         header: true,
         skipEmptyLines: true,
