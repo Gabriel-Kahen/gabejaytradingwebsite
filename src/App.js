@@ -2,12 +2,11 @@ import React, { useState, useEffect, useCallback } from 'react';
 import Papa from 'papaparse';
 import PortfolioChart from './PortfolioChart';
 import Sidebar from './Sidebar';
-import './index.css'
+import './index.css';
 
 // Helper function to format dates as M/D/YYYY, hh:mm AM/PM in EST.
 function formatDate(dateString) {
   const date = new Date(dateString);
-  // Manually subtract 5 hours (adjust if needed for daylight saving)
   date.setHours(date.getHours() - 5);
   const options = {
     month: 'numeric',
@@ -23,19 +22,17 @@ function formatDate(dateString) {
 function App() {
   const [trades, setTrades] = useState([]);
   const [portfolioHistory, setPortfolioHistory] = useState([]);
-  const [selectedTradeTime, setSelectedTradeTime] = useState(null); // ✅ NEW: Store selected trade time
+  const [selectedTradeTime, setSelectedTradeTime] = useState(null); 
 
   const CSV_URL = 'https://storage.googleapis.com/gabe-jay-stock/data/trade_log.csv';
 
   const processTrades = useCallback((data) => {
-    let portfolio = 1000000; // starting with $1,000,000
+    let portfolio = 1000000;
     const history = [];
   
-    // Insert an initial data point for the chart:
     history.push({ time: 'Start', portfolio });
   
     const processedTrades = data.map((row) => {
-      // Use the helper function to format dates
       const ticker = row.Stock;
       const rawBuyTime = row['Entry Time'];
       const rawSellTime = row['Exit Time'];
@@ -44,7 +41,6 @@ function App() {
       const buyPrice = parseFloat(row['Buy Price']);
       const sellPrice = parseFloat(row['Sell Price']);
   
-      // Determine the number of shares purchased with 1/3 of the current portfolio value
       const investmentAmount = portfolio / 3;
       const shares = Math.floor(investmentAmount / buyPrice);
       const cost = shares * buyPrice;
@@ -52,7 +48,6 @@ function App() {
       const profit = proceeds - cost;
       const percentProfit = (profit / cost) * 100;
   
-      // Update the portfolio value after each trade
       portfolio += profit;
       history.push({ time: sellTime, portfolio });
   
@@ -72,11 +67,10 @@ function App() {
   
     setTrades(processedTrades);
     setPortfolioHistory(history);
-  }, [setTrades, setPortfolioHistory]);
+  }, []);
 
   const fetchData = useCallback(async () => {
     try {
-      // Append a timestamp to prevent caching.
       const csvUrl = `${CSV_URL}?t=${Date.now()}`;
       const response = await fetch(csvUrl);
       const csvData = await response.text();
@@ -102,21 +96,17 @@ function App() {
     return () => clearInterval(interval);
   }, [fetchData]);
 
-  // ✅ NEW: Function to handle trade selection from PortfolioChart.js
   const handleTradeSelect = (time) => {
     setSelectedTradeTime(time);
   };
 
   return (
-    <div style={{ display: 'flex', height: '100vh' }}>
-      {/* Centering the chart only vertically */}
-      <div style={{ flex: 3, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '20px' }}>
-        <PortfolioChart data={portfolioHistory} onTradeSelect={handleTradeSelect} /> {/* ✅ Pass callback to chart */}
+    <div className="app-container">
+      <div className="main-content">
+        <PortfolioChart data={portfolioHistory} onTradeSelect={handleTradeSelect} />
       </div>
-  
-      {/* Sidebar */}
-      <div style={{ flex: 1, padding: '20px', borderLeft: '1px solid #ddd', overflowY: 'auto' }}>
-        <Sidebar trades={trades} selectedTradeTime={selectedTradeTime} /> {/* ✅ Pass selected trade to sidebar */}
+      <div className="sidebar">
+        <Sidebar trades={trades} selectedTradeTime={selectedTradeTime} />
       </div>
     </div>
   );

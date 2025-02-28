@@ -22,21 +22,18 @@ ChartJS.register(
 );
 
 function PortfolioChart({ data, onTradeSelect, highlightedTrade }) {
-  // Aggregate trades by time (assume each trade item has a "time" field matching sellTime)
   const aggregatedData = {};
   data.forEach((item) => {
-    aggregatedData[item.time] = item.portfolio; // store the portfolio value at each timestamp
+    aggregatedData[item.time] = item.portfolio;
   });
 
-  // Ensure timestamps are sorted chronologically
   const uniqueTimes = Object.keys(aggregatedData).sort(
     (a, b) => new Date(a) - new Date(b)
   );
   const portfolioValues = uniqueTimes.map((time) => aggregatedData[time]);
 
-  // Determine point colors: highlight the point if its timestamp matches the highlighted trade
   const defaultColor = 'rgb(52, 203, 42)';
-  const highlightColor = 'yellow'; // adjust as needed
+  const highlightColor = 'yellow';
   const pointBackgroundColors = uniqueTimes.map((time) =>
     time === highlightedTrade ? highlightColor : defaultColor
   );
@@ -57,7 +54,6 @@ function PortfolioChart({ data, onTradeSelect, highlightedTrade }) {
     ],
   };
 
-  // When a point is clicked, call onTradeSelect with the corresponding timestamp
   const options = {
     responsive: true,
     maintainAspectRatio: false,

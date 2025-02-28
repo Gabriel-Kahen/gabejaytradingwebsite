@@ -1,13 +1,11 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 
 function Sidebar({ trades, selectedTradeTime }) {
-  // Memoize sorted trades so they don't change on every render
   const sortedTrades = useMemo(
     () => [...trades].sort((a, b) => new Date(b.sellTime) - new Date(a.sellTime)),
     [trades]
   );
 
-  // Group trades by date and memoize
   const tradesByDate = useMemo(() => {
     return sortedTrades.reduce((acc, trade) => {
       const dateKey = new Date(trade.sellTime).toLocaleDateString('en-US');
@@ -17,19 +15,15 @@ function Sidebar({ trades, selectedTradeTime }) {
     }, {});
   }, [sortedTrades]);
 
-  // Memoize tradeDates so they only change when tradesByDate changes
   const tradeDates = useMemo(() => Object.keys(tradesByDate), [tradesByDate]);
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [highlightedTrade, setHighlightedTrade] = useState(null);
   const tradeRefs = useRef({});
 
-  // When the user navigates manually, we want to ignore the chart selection.
   const [ignoreChartSelection, setIgnoreChartSelection] = useState(false);
-  // Track the last processed selectedTradeTime so we can detect a new selection.
   const lastSelectedTradeRef = useRef(null);
 
-  // If the parent's selectedTradeTime changes (i.e. a new selection), reset ignore flag.
   useEffect(() => {
     if (selectedTradeTime !== lastSelectedTradeRef.current) {
       setIgnoreChartSelection(false);
@@ -37,7 +31,6 @@ function Sidebar({ trades, selectedTradeTime }) {
     }
   }, [selectedTradeTime]);
 
-  // Update index when clicking a chart point, unless we're ignoring chart selection
   useEffect(() => {
     if (selectedTradeTime && !ignoreChartSelection) {
       const selectedDate = tradeDates.find(date =>
@@ -54,7 +47,6 @@ function Sidebar({ trades, selectedTradeTime }) {
   const currentDate = tradeDates[currentIndex];
   const currentTrades = tradesByDate[currentDate] || [];
 
-  // Group trades by time (3 trades per group)
   const groupedTrades = [];
   for (let i = 0; i < currentTrades.length; i += 3) {
     const group = currentTrades.slice(i, i + 3);
@@ -79,13 +71,10 @@ function Sidebar({ trades, selectedTradeTime }) {
     });
   }
 
-  // Create refs to store timeout IDs so we can clear them on new selections
   const scrollTimeoutRef = useRef(null);
   const highlightTimeoutRef = useRef(null);
 
-  // Scroll and highlight the trade after clicking a chart point
   useEffect(() => {
-    // Clear any previous timeouts so that rapid clicks always start fresh timers
     if (scrollTimeoutRef.current) {
       clearTimeout(scrollTimeoutRef.current);
     }
@@ -106,7 +95,6 @@ function Sidebar({ trades, selectedTradeTime }) {
       }, 300);
     }
 
-    // Cleanup function to clear timeouts if the effect re-runs
     return () => {
       clearTimeout(scrollTimeoutRef.current);
       clearTimeout(highlightTimeoutRef.current);
