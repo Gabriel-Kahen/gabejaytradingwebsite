@@ -6,6 +6,8 @@ function Sidebar({ trades, selectedTradeTime }) {
     [trades]
   );
 
+//not loaded into trades
+
   const tradesByDate = useMemo(() => {
     return sortedTrades.reduce((acc, trade) => {
       const dateKey = new Date(trade.sellTime).toLocaleDateString('en-US');
@@ -31,6 +33,8 @@ function Sidebar({ trades, selectedTradeTime }) {
     }
   }, [selectedTradeTime]);
 
+
+  
   useEffect(() => {
     if (selectedTradeTime && !ignoreChartSelection) {
       const selectedDate = tradeDates.find(date =>
@@ -44,11 +48,12 @@ function Sidebar({ trades, selectedTradeTime }) {
     }
   }, [selectedTradeTime, tradeDates, tradesByDate, ignoreChartSelection]);
 
+
+  
   const currentDate = tradeDates[currentIndex];
   const currentTrades = tradesByDate[currentDate] || [];
-
   const groupedTrades = [];
-  for (let i = 0; i < currentTrades.length; i += 3) {
+  for (let i = 0; i < currentTrades.length; i +=3) {
     const group = currentTrades.slice(i, i + 3);
     const buyTimes = group.map(trade => new Date(trade.buyTime));
     const sellTimes = group.map(trade => new Date(trade.sellTime));

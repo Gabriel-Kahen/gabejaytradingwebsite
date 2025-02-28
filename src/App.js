@@ -40,7 +40,6 @@ function App() {
       const sellTime = formatDate(rawSellTime);
       const buyPrice = parseFloat(row['Buy Price']);
       const sellPrice = parseFloat(row['Sell Price']);
-  
       const investmentAmount = portfolio / 3;
       const shares = Math.floor(investmentAmount / buyPrice);
       const cost = shares * buyPrice;
@@ -72,9 +71,8 @@ function App() {
   const fetchData = useCallback(async () => {
     try {
       const csvUrl = `${CSV_URL}?t=${Date.now()}`;
-      const response = await fetch(csvUrl);
-      const csvData = await response.text();
-  
+      const response = await fetch(csvUrl, { cache: "no-store" });      const csvData = await response.text();
+      console.log(csvData)
       Papa.parse(csvData, {
         header: true,
         skipEmptyLines: true,
