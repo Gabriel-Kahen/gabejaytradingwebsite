@@ -21,25 +21,79 @@ ChartJS.register(
   Legend
 );
 
-function PortfolioChart({ data }) {
-  // Prepare chart labels (using sell times) and portfolio values
+function PortfolioChart({ data, onTradeSelect, highlightedTrade }) {
+  // Aggregate trades by time (assume each trade item has a "time" field matching sellTime)
+  const aggregatedData = {};
+  data.forEach((item) => {
+    aggregatedData[item.time] = item.portfolio; // store the portfolio value at each timestamp
+  });
+
+  // Ensure timestamps are sorted chronologically
+  const uniqueTimes = Object.keys(aggregatedData).sort(
+    (a, b) => new Date(a) - new Date(b)
+  );
+  const portfolioValues = uniqueTimes.map((time) => aggregatedData[time]);
+
+  // Determine point colors: highlight the point if its timestamp matches the highlighted trade
+  const defaultColor = 'rgba(75,192,192,1)';
+  const highlightColor = 'yellow'; // adjust as needed
+  const pointBackgroundColors = uniqueTimes.map((time) =>
+    time === highlightedTrade ? highlightColor : defaultColor
+  );
+
   const chartData = {
-    labels: data.map((item) => item.time),
+    labels: uniqueTimes,
     datasets: [
       {
         label: 'Portfolio Value',
-        data: data.map((item) => item.portfolio),
+        data: portfolioValues,
         fill: false,
-        borderColor: 'rgba(75,192,192,1)',
-        tension: 0.1
+        borderColor: defaultColor,
+        tension: 0.1,
+        pointRadius: 5,
+        pointHoverRadius: 7,
+        pointBackgroundColor: pointBackgroundColors,
+      },
+    ],
+  };
+
+  // When a point is clicked, call onTradeSelect with the corresponding timestamp
+  const options = {
+    responsive: true,
+    maintainAspectRatio: false,
+    onClick: (event, elements) => {
+      if (elements.length > 0) {
+        const index = elements[0].index;
+        const selectedTime = uniqueTimes[index];
+        if (onTradeSelect) {
+          onTradeSelect(selectedTime);
+        }
       }
-    ]
+    },
   };
 
   return (
-    <div>
-      <h2>Portfolio Value Over Time</h2>
-      <Line data={chartData} />
+    <div
+      style={{
+        width: '100%',
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+      }}
+    >
+      <h2
+        style={{
+          textAlign: 'center',
+          fontSize: '40px',
+          fontWeight: '900',
+          marginBottom: '10px',
+        }}
+      >
+        Portfolio Performance
+      </h2>
+      <div style={{ flexGrow: 1 }}>
+        <Line data={chartData} options={options} />
+      </div>
     </div>
   );
 }

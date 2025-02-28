@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import Papa from 'papaparse';
 import PortfolioChart from './PortfolioChart';
 import Sidebar from './Sidebar';
+import './index.css'
 
 // Helper function to format dates as M/D/YYYY, hh:mm AM/PM in EST.
 function formatDate(dateString) {
@@ -22,6 +23,7 @@ function formatDate(dateString) {
 function App() {
   const [trades, setTrades] = useState([]);
   const [portfolioHistory, setPortfolioHistory] = useState([]);
+  const [selectedTradeTime, setSelectedTradeTime] = useState(null); // ✅ NEW: Store selected trade time
 
   const CSV_URL = 'https://storage.googleapis.com/gabe-jay-stock/data/trade_log.csv';
 
@@ -99,13 +101,21 @@ function App() {
     return () => clearInterval(interval);
   }, [fetchData]);
 
+  // ✅ NEW: Function to handle trade selection from PortfolioChart.js
+  const handleTradeSelect = (time) => {
+    setSelectedTradeTime(time);
+  };
+
   return (
     <div style={{ display: 'flex', height: '100vh' }}>
-      <div style={{ flex: 3, padding: '20px' }}>
-        <PortfolioChart data={portfolioHistory} />
+      {/* Centering the chart only vertically */}
+      <div style={{ flex: 3, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '20px' }}>
+        <PortfolioChart data={portfolioHistory} onTradeSelect={handleTradeSelect} /> {/* ✅ Pass callback to chart */}
       </div>
+  
+      {/* Sidebar */}
       <div style={{ flex: 1, padding: '20px', borderLeft: '1px solid #ddd', overflowY: 'auto' }}>
-        <Sidebar trades={trades} />
+        <Sidebar trades={trades} selectedTradeTime={selectedTradeTime} /> {/* ✅ Pass selected trade to sidebar */}
       </div>
     </div>
   );
