@@ -35,7 +35,7 @@ function PortfolioChart({ data, onTradeSelect, highlightedTrade }) {
   const portfolioValues = uniqueTimes.map((time) => aggregatedData[time]);
 
   // Determine point colors: highlight the point if its timestamp matches the highlighted trade
-  const defaultColor = 'rgba(75,192,192,1)';
+  const defaultColor = 'rgb(52, 203, 42)';
   const highlightColor = 'yellow'; // adjust as needed
   const pointBackgroundColors = uniqueTimes.map((time) =>
     time === highlightedTrade ? highlightColor : defaultColor
