@@ -30,10 +30,10 @@ function App() {
   const processTrades = useCallback((data) => {
     let portfolio = 1000000; // starting with $1,000,000
     const history = [];
-
+  
     // Insert an initial data point for the chart:
     history.push({ time: 'Start', portfolio });
-
+  
     const processedTrades = data.map((row) => {
       // Use the helper function to format dates
       const ticker = row.Stock;
@@ -43,18 +43,19 @@ function App() {
       const sellTime = formatDate(rawSellTime);
       const buyPrice = parseFloat(row['Buy Price']);
       const sellPrice = parseFloat(row['Sell Price']);
-
-      // Determine the number of shares purchased with $300K
-      const shares = Math.floor(300000 / buyPrice);
+  
+      // Determine the number of shares purchased with 1/3 of the current portfolio value
+      const investmentAmount = portfolio / 3;
+      const shares = Math.floor(investmentAmount / buyPrice);
       const cost = shares * buyPrice;
       const proceeds = shares * sellPrice;
       const profit = proceeds - cost;
       const percentProfit = (profit / cost) * 100;
-
+  
       // Update the portfolio value after each trade
       portfolio += profit;
       history.push({ time: sellTime, portfolio });
-
+  
       return {
         ticker,
         buyTime,
@@ -68,7 +69,7 @@ function App() {
         percentProfit
       };
     });
-
+  
     setTrades(processedTrades);
     setPortfolioHistory(history);
   }, [setTrades, setPortfolioHistory]);
