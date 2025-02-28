@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Line } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -22,6 +22,20 @@ ChartJS.register(
 );
 
 function PortfolioChart({ data, onTradeSelect, highlightedTrade }) {
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Check screen orientation (or you can use a width threshold)
+  useEffect(() => {
+    const checkOrientation = () => {
+      // Here we use portrait orientation as a proxy for mobile.
+      setIsMobile(window.matchMedia('(orientation: portrait)').matches);
+    };
+
+    checkOrientation();
+    window.addEventListener('resize', checkOrientation);
+    return () => window.removeEventListener('resize', checkOrientation);
+  }, []);
+
   const aggregatedData = {};
   data.forEach((item) => {
     aggregatedData[item.time] = item.portfolio;
@@ -47,8 +61,9 @@ function PortfolioChart({ data, onTradeSelect, highlightedTrade }) {
         fill: false,
         borderColor: defaultColor,
         tension: 0.1,
-        pointRadius: 5,
-        pointHoverRadius: 7,
+        // Adjust the dot size based on screen orientation
+        pointRadius: isMobile ? 3 : 5,
+        pointHoverRadius: isMobile ? 4 : 7,
         pointBackgroundColor: pointBackgroundColors,
       },
     ],

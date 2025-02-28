@@ -41,8 +41,8 @@ body {
   }
   
   .main-content {
-    min-height: 60vh;
-    height: 60vh;
+    min-height: 80vh;
+    height: 100vh;
     display: flex;
     flex-direction: column;
   }
