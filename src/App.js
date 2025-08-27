@@ -4,10 +4,18 @@ import PortfolioChart from './PortfolioChart';
 import Sidebar from './Sidebar';
 import './index.css';
 
-// Helper function to format dates as M/D/YYYY, hh:mm AM/PM in EST.
+// Helper function to format dates as M/D/YYYY, hh:mm AM/PM in EST/EDT.
 function formatDate(dateString) {
   const date = new Date(dateString);
-  date.setHours(date.getHours() - 5);
+  
+  // Check if the date is after March 9th (not including March 9th itself)
+  const year = date.getFullYear();
+  const marchNinth = new Date(year, 2, 9, 23, 59, 59, 999); // End of March 9th
+  
+  // If after March 9th, subtract 4 hours (EDT), otherwise subtract 5 hours (EST)
+  const hoursToSubtract = date > marchNinth ? 4 : 5;
+  date.setHours(date.getHours() - hoursToSubtract);
+  
   const options = {
     month: 'numeric',
     day: 'numeric',
