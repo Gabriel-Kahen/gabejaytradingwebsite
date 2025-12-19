@@ -107,12 +107,22 @@ function App() {
   };
 
   return (
-    <div className="app-container">
-      <div className="main-content">
-        <PortfolioChart data={portfolioHistory} onTradeSelect={handleTradeSelect} />
+    <div className="app-shell">
+      <div className="announcement-bar" role="status" aria-live="polite">
+        <span className="status-dot" aria-hidden="true"></span>
+        <div className="announcement-copy">
+          <strong>Heads up:</strong> This experiment was shut down on 11/14/25.
+          <span className="announcement-muted">Data remains available for review.</span>
+        </div>
       </div>
-      <div className="sidebar">
-        <Sidebar trades={trades} selectedTradeTime={selectedTradeTime} />
+
+      <div className="app-container">
+        <div className="main-content">
+          <PortfolioChart data={portfolioHistory} onTradeSelect={handleTradeSelect} />
+        </div>
+        <div className="sidebar">
+          <Sidebar trades={trades} selectedTradeTime={selectedTradeTime} />
+        </div>
       </div>
     </div>
   );

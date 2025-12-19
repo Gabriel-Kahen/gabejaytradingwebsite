@@ -72,7 +72,8 @@ function Sidebar({ trades, selectedTradeTime }) {
     groupedTrades.push({
       trades: group,
       holdingPeriod: `${earliestBuyTime} → ${latestSellTime}`,
-      id: group[0].sellTime,
+      id: group[group.length - 1].sellTime,
+      tradeKeys: group.map((trade) => trade.sellTime),
     });
   }
 
@@ -107,62 +108,70 @@ function Sidebar({ trades, selectedTradeTime }) {
   }, [selectedTradeTime]);
 
   return (
-    <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ height: '100%', display: 'flex', flexDirection: 'column', gap: '6px', color: 'var(--text-primary)' }}>
       {/* Scrollable Main Content */}
-      <div style={{ overflowY: 'auto', flex: 1, paddingBottom: '10px' }}>
+      <div style={{ overflowY: 'auto', flex: 1, paddingBottom: '12px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
         {/* Sticky Header */}
         <div 
           style={{
             position: 'sticky',
             top: 0,
-            backgroundColor: 'white',
+            backgroundColor: 'var(--panel)',
             zIndex: 10,
-            padding: '8px 10px',
-            borderBottom: '1px solid #ddd',
-            textAlign: 'center'
+            padding: '10px 10px 12px',
+            borderBottom: '1px solid var(--border)',
+            textAlign: 'center',
+            boxShadow: '0 12px 24px rgba(0, 0, 0, 0.25)'
           }}
         >
           <h2 style={{ margin: '0', fontSize: '1.5rem' }}>Trade Details</h2>
-          <h3 style={{ margin: '0', fontSize: '1.2rem' }}>{currentDate}</h3>
+          <h3 style={{ margin: '4px 0 0', fontSize: '1.1rem', color: 'var(--text-muted)' }}>{currentDate}</h3>
         </div>
 
         {/* Trade Groups */}
         {groupedTrades.map((group, index) => (
           <div
             key={index}
-            ref={(el) => (tradeRefs.current[group.id] = el)}
+            ref={(el) => {
+              if (!el) return;
+              group.tradeKeys.forEach((key) => {
+                tradeRefs.current[key] = el;
+              });
+            }}
             onMouseEnter={() => setHighlightedTrade(group.id)}
             onMouseLeave={() => setHighlightedTrade(null)}
             style={{
-              border: '1px solid #ddd',
-              padding: '10px',
-              marginBottom: '10px',
-              borderRadius: '5px',
-              backgroundColor: group.id === highlightedTrade ? '#f0f8ff' : 'transparent',
-              transition: 'background-color 0.3s ease-in-out',
+              border: `1px solid ${group.tradeKeys.includes(highlightedTrade) ? 'rgba(50, 219, 167, 0.45)' : 'var(--border)'}`,
+              padding: '12px',
+              marginBottom: '4px',
+              borderRadius: '12px',
+              backgroundColor: group.tradeKeys.includes(highlightedTrade) ? 'rgba(50, 219, 167, 0.08)' : 'rgba(255, 255, 255, 0.02)',
+              transition: 'background-color 0.25s ease-in-out, border-color 0.25s ease-in-out',
+              boxShadow: '0 12px 32px rgba(2, 10, 30, 0.35)'
             }}
           >
-            <strong>Holding Period: {group.holdingPeriod}</strong>
-            <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '5px' }}>
+            <strong style={{ color: 'var(--text-primary)' }}>Holding Period: {group.holdingPeriod}</strong>
+            <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '5px', fontSize: '0.95rem' }}>
               <thead>
-                <tr style={{ borderBottom: '1px solid #ddd' }}>
-                  <th style={{ textAlign: 'left', padding: '5px' }}>Stock</th>
-                  <th style={{ textAlign: 'right', padding: '5px' }}>Buy Price</th>
-                  <th style={{ textAlign: 'right', padding: '5px' }}>Sell Price</th>
-                  <th style={{ textAlign: 'right', padding: '5px' }}>% Profit</th>
+                <tr style={{ borderBottom: '1px solid var(--border)' }}>
+                  <th style={{ textAlign: 'left', padding: '6px 5px', color: 'var(--text-muted)' }}>Stock</th>
+                  <th style={{ textAlign: 'right', padding: '6px 5px', color: 'var(--text-muted)' }}>Buy Price</th>
+                  <th style={{ textAlign: 'right', padding: '6px 5px', color: 'var(--text-muted)' }}>Sell Price</th>
+                  <th style={{ textAlign: 'right', padding: '6px 5px', color: 'var(--text-muted)' }}>% Profit</th>
                 </tr>
               </thead>
               <tbody>
                 {group.trades.map((trade, i) => (
-                  <tr key={i} style={{ borderBottom: '1px solid #eee' }}>
-                    <td style={{ padding: '5px' }}><strong>{trade.ticker}</strong></td>
-                    <td style={{ padding: '5px', textAlign: 'right' }}>${trade.buyPrice.toFixed(2)}</td>
-                    <td style={{ padding: '5px', textAlign: 'right' }}>${trade.sellPrice.toFixed(2)}</td>
+                  <tr key={i} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                    <td style={{ padding: '6px 5px' }}><strong>{trade.ticker}</strong></td>
+                    <td style={{ padding: '6px 5px', textAlign: 'right', color: 'var(--text-primary)' }}>${trade.buyPrice.toFixed(2)}</td>
+                    <td style={{ padding: '6px 5px', textAlign: 'right', color: 'var(--text-primary)' }}>${trade.sellPrice.toFixed(2)}</td>
                     <td
                       style={{
-                        padding: '5px',
+                        padding: '6px 5px',
                         textAlign: 'right',
-                        color: trade.percentProfit >= 0 ? 'green' : 'red'
+                        color: trade.percentProfit >= 0 ? '#32dba7' : '#f87171',
+                        fontWeight: 700
                       }}
                     >
                       {trade.percentProfit.toFixed(2)}%
@@ -178,12 +187,13 @@ function Sidebar({ trades, selectedTradeTime }) {
       {/* Footer Navigation inside Sidebar */}
       <div
         style={{
-          backgroundColor: 'white',
-          borderTop: '1px solid #ddd',
+          backgroundColor: 'var(--panel)',
+          borderTop: '1px solid var(--border)',
           paddingTop: '15px',
           display: 'flex',
           justifyContent: 'space-between',
-          alignItems: 'center'
+          alignItems: 'center',
+          gap: '10px'
         }}
       >
         <button
