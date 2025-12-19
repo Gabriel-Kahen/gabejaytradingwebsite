@@ -95,7 +95,7 @@ function PortfolioChart({ data, onTradeSelect, highlightedTrade }) {
         borderWidth: 3,
         tension: 0.3,
         // Adjust the dot size based on screen orientation
-        //im testing
+        //im testing again
         pointRadius: isMobile ? 3 : 6,
         pointHoverRadius: isMobile ? 4 : 8,
         pointBackgroundColor: pointBackgroundColors,
