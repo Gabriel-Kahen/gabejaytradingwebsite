@@ -28,6 +28,7 @@ function formatDate(dateString) {
 }
 
 function App() {
+  const isOldRoute = window.location.pathname.startsWith('/old') || new URLSearchParams(window.location.search).get('legacy') === '1';
   const [trades, setTrades] = useState([]);
   const [portfolioHistory, setPortfolioHistory] = useState([]);
   const [selectedTradeTime, setSelectedTradeTime] = useState(null); 
@@ -97,14 +98,30 @@ function App() {
   }, [CSV_URL, processTrades]);
 
   useEffect(() => {
+    if (!isOldRoute) {
+      document.title = 'gabejaytrading';
+      return;
+    }
     fetchData();
     const interval = setInterval(fetchData, 1000);
     return () => clearInterval(interval);
-  }, [fetchData]);
+  }, [fetchData, isOldRoute]);
 
   const handleTradeSelect = (time) => {
     setSelectedTradeTime(time);
   };
+
+  if (!isOldRoute) {
+    return (
+      <div style={{ minHeight: '100vh', background: '#0a0a0a' }}>
+        <iframe
+          title="gabejaytrading"
+          src="/new/"
+          style={{ display: 'block', width: '100%', height: '100vh', border: '0' }}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="app-shell">
